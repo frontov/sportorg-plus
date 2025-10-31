@@ -134,6 +134,7 @@ class CourseControl(Model):
         self.code = ''
         self.length = 0
         self.order = 0
+        self.cutoff = False
 
     def __str__(self):
         return '{} {}'.format(self.code, self.length)
@@ -173,11 +174,14 @@ class CourseControl(Model):
             'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length,
+            'cutoff': self.cutoff
         }
 
     def update_data(self, data):
         self.code = str(data['code'])
         self.length = int(data['length'])
+        if 'cutoff' in data:
+            self.cutoff = bool(data['cutoff'])
 
 
 class ControlPoint(Model):
@@ -823,6 +827,8 @@ class Result:
         ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time().to_msec(time_accuracy)
         ret_ms += self.get_penalty_time().to_msec(time_accuracy)
         ret_ms -= self.get_credit_time().to_msec(time_accuracy)
+        if ret_ms < 0:
+            ret_ms = 0
         return OTime(msec=ret_ms)
 
     def get_pure_otime(self):

@@ -15,9 +15,7 @@ class ResultChecker:
         self.person = person
 
     def check_result(self, result):
-        if self.person is None:
-            return True
-        if self.person.group is None:
+        if self.person is None or self.person.group is None:
             return True
 
         course = race().find_course(result)
@@ -54,6 +52,7 @@ class ResultChecker:
 
             check_flag = o.check_result(result)
             ResultChecker.calculate_penalty(result)
+            ResultChecker.calculate_credit_time(result)
             if not check_flag:
                 result.status = ResultStatus.MISSING_PUNCH
                 if not result.status_comment:
@@ -86,9 +85,7 @@ class ResultChecker:
 
         person = result.person
 
-        if person is None:
-            return
-        if person.group is None:
+        if person is None or person.group is None:
             return
 
         course = race().find_course(result)
@@ -114,6 +111,25 @@ class ResultChecker:
         elif mode == 'time':
             time_for_one_penalty = OTime(msec=race().get_setting('marked_route_penalty_time', 60000))
             result.penalty_time = time_for_one_penalty * penalty
+
+    @staticmethod
+    def calculate_credit_time(result):
+        result.credit_time = OTime()
+
+        course = race().find_course(result)
+        if not course:
+            return
+        for control in course.controls:
+            if control.cutoff:
+                for i, split in enumerate(result.splits):
+                    if split.is_correct and split.code == control.code:
+                        if i < len(result.splits) - 1:
+                            # Find next correct punch
+                            for s in result.splits[i + 1:]:
+                                if s.is_correct:
+                                    result.credit_time += s.time - split.time
+                                    break
+
 
     @staticmethod
     def get_marked_route_incorrect_list(controls):

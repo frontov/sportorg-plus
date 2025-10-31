@@ -2210,6 +2210,12 @@ msgstr "Результат {} уже существует"
 msgid "Remove result"
 msgstr "Удаляю результат"
 
+msgid "cutoff"
+msgstr "отсечка"
+
+msgid "ct"
+msgstr "отс"
+
 #~ msgid "Internal printing"
 #~ msgstr "Стандартный шаблон"
 
