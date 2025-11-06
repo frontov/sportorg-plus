@@ -134,6 +134,7 @@ class CourseControl(Model):
         self.code = ''
         self.length = 0
         self.order = 0
+        self.cutoff = False
 
     def __str__(self):
         return '{} {}'.format(self.code, self.length)
@@ -173,11 +174,14 @@ class CourseControl(Model):
             'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length,
+            'cutoff': self.cutoff
         }
 
     def update_data(self, data):
         self.code = str(data['code'])
         self.length = int(data['length'])
+        if 'cutoff' in data:
+            self.cutoff = bool(data['cutoff'])
 
 
 class ControlPoint(Model):
@@ -823,6 +827,8 @@ class Result:
         ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time().to_msec(time_accuracy)
         ret_ms += self.get_penalty_time().to_msec(time_accuracy)
         ret_ms -= self.get_credit_time().to_msec(time_accuracy)
+        if ret_ms < 0:
+            ret_ms = 0
         return OTime(msec=ret_ms)
 
     def get_pure_otime(self):
@@ -1756,14 +1762,17 @@ class Race(Model):
     def add_new_result(self, result):
         self.results.insert(0, result)
 
-    def add_result(self, result):
-        add = True
+    def add_result(self, result, remove_dns=False):
+        message = ''
         for r in self.results:
             if r is result:
-                add = False
-                break
-        if add:
-            self.add_new_result(result)
+                return
+            if remove_dns and r.person == result.person and r.status == ResultStatus.DID_NOT_START:
+                message = _("Remove result")+': '+str(r.person)+', '+r.status.get_title()
+                self.results.remove(r)
+
+        self.add_new_result(result)
+        return message
 
     def clear_results(self):
         for result in self.results:

@@ -180,6 +180,8 @@ class ResultEditDialog(QDialog):
         bib = self.item_bib.value()
         self.label_person_info.setText('')
         if bib:
+            if race().get_setting('card_number_as_bib', False):
+                self.item_card_number.setValue(int(bib))
             person = find(race().persons, bib=bib)
             if person:
                 info = person.full_name
@@ -195,6 +197,7 @@ class ResultEditDialog(QDialog):
         if self.current_object.is_punch():
             if self.current_object.card_number:
                 self.item_card_number.setValue(int(self.current_object.card_number))
+                self.item_card_number.setDisabled(race().get_setting('card_number_as_bib', False))
             self.splits.splits(self.current_object.splits)
             self.splits.show()
         if self.current_object.created_at:
@@ -369,10 +372,13 @@ class SplitsText(SplitsObject):
                 if not row.strip():
                     continue
                 item = row.split()
-                if len(item) >= 2:
+                if len(item) >= 1:
                     split = Split()
                     split.code = item[0]
-                    split.time = hhmmss_to_time(item[1])
+                    time_str = ''
+                    if len(item) >= 2:
+                        time_str = item[1]
+                    split.time = hhmmss_to_time(time_str)
                     if self._more24 and len(item) >= 3 and item[2].isdigit():
                         split.days = int(item[2])
                     splits.append(split)
