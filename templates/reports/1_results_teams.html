@@ -52,6 +52,7 @@
             sex: person.sex > 0 ? (person.sex == 1 ? 'М' : 'Ж') : '',
             penalty_time: result.penalty_time > 0 ? toHHMMSS(result.penalty_time) : '',
             penalty_points: result.penalty_points > 0 ? result.penalty_points : '',
+            credit_time: result.credit_time > 0 ? toHHMMSS(result.credit_time) : '',
             result: result.result,
             time: result.finish_msec > result.start_msec ? toHHMMSS(result.finish_msec - result.start_msec) : toHHMMSS(result.finish_msec + 86400000 - result.start_msec),
             result_msec: result.result_msec,
@@ -90,6 +91,7 @@
             // Copy status description from result
             r.scores = r.result;
             r.penalty_time = '';
+            r.credit_time = '';
             r.penalty_points = '';
         }
         return r
@@ -274,10 +276,11 @@
             {key: 'scores_without_penalty', title: 'Очки', size: 5, active: false},
             {key: 'penalty_points', title: 'Штраф', size: 9, active: false},
             {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
+            {key: 'credit_time', title: 'Отсечка', size: 9, active: false},
             {key: 'result', title: 'Результат', size: 16},
             {key: 'scores', title: 'Результат', size: 5, active: false},
             {key: 'diff', title: 'Отставание', size: 11},
-            {key: 'subgroup', title: 'П/группа', size: 8},
+            {key: 'subgroup', title: 'П/группа', size: 8, active: false},
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -316,7 +319,9 @@
             try {
                 var isTeamRace = race.data.race_type === 6
                 var isRogaining = race.settings.result_processing_mode === 'scores'
-                this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+                this.getField('penalty_time').active = location.href.indexOf('pt=1') > -1;
+                this.getField('credit_time').active = location.href.indexOf('ct=1') > -1;
+                this.getField('subgroup').active = location.href.indexOf('sg=1') > -1;
 
                 this.getField('scores_without_penalty').active = isRogaining
                 this.getField('penalty_points').active = isRogaining
@@ -398,7 +403,9 @@
 
         var query = {
             by_course: store.showProtocolByCourse ? 1 : 0,
-            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+            pt: Fields.isActive('penalty_time') ? 1 : 0,
+            ct: Fields.isActive('credit_time') ? 1 : 0,
+            sg: Fields.isActive('subgroup') ? 1 : 0
         };
         var queryString = '';
         Object.keys(query).forEach(function (key) {
@@ -494,6 +501,14 @@
             }
         },
         {
+            title: 'Отсечка',
+            value: Fields.isActive('credit_time'),
+            change: function (checked) {
+                Fields.active('credit_time', checked);
+                render()
+            }
+        },
+        {
             title: 'Отставание',
             value: Fields.isActive('diff'),
             change: function (checked) {
@@ -502,6 +517,14 @@
             }
         },
         {% endif %}{% raw %}
+        {
+            title: 'Подгруппы',
+            value: Fields.isActive('subgroup'),
+            change: function (checked) {
+                Fields.active('subgroup', checked);
+                render()
+            }
+        },
         {
             title: 'Показать первые: ',
             value: [

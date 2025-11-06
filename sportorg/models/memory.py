@@ -533,7 +533,6 @@ class Split(Model):
         self.index = 0
         self.course_index = -1
         self.code = ''
-        self.days = 0
         self._time = OTime()  # type: OTime
         self.leg_time = OTime()  # type: OTime
         self.relative_time = OTime()  # type: OTime
@@ -564,7 +563,6 @@ class Split(Model):
     def to_dict(self):
         return {
             'object': self.__class__.__name__,
-            'days': self.days,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
 
@@ -583,8 +581,6 @@ class Split(Model):
         self.code = str(data['code'])
         if data['time']:
             self._time = OTime(msec=data['time'])
-        if 'days' in data:
-            self.days = int(data['days'])
 
 
 class Result:
@@ -592,7 +588,6 @@ class Result:
         if type(self) == Result:
             raise Exception("<Result> is abstracted")
         self.id = uuid.uuid4()
-        self.days = 0
         self.bib = 0
         self.start_time = None  # type: OTime
         self.finish_time = OTime.now()  # type: OTime
@@ -672,7 +667,6 @@ class Result:
             'bib': self.bib,
             'system_type': self.system_type.value,
             'person_id': str(self.person.id) if self.person else None,
-            'days': self.days,
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'diff': self.diff.to_msec() if self.diff else None,
@@ -724,8 +718,6 @@ class Result:
             self.penalty_points = int(data['penalty_points'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
-        if 'days' in data:
-            self.days = int(data['days'])
         if 'created_at' in data:
             self.created_at = float(data['created_at'])
         else:
@@ -1666,7 +1658,6 @@ class Race(Model):
         if obj is None:
             obj = ResultSportident
         new_result = obj()
-        new_result.days = self.get_days()
         return new_result
 
     def add_new_person(self, append_to_race=False):

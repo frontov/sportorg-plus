@@ -114,8 +114,7 @@ class ResultChecker:
 
     @staticmethod
     def calculate_credit_time(result):
-        result.credit_time = OTime()
-
+        credit_time_clear = False
         course = race().find_course(result)
         if not course:
             return
@@ -127,6 +126,9 @@ class ResultChecker:
                             # Find next correct punch
                             for s in result.splits[i + 1:]:
                                 if s.is_correct:
+                                    if not credit_time_clear:
+                                        credit_time_clear = True
+                                        result.credit_time = OTime()
                                     result.credit_time += s.time - split.time
                                     break
 

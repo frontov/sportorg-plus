@@ -9,17 +9,21 @@ class DurationEdit(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        self.daysSpin = QSpinBox()
-        self.daysSpin.setRange(0, 99)
-        self.daysSpin.setValue(0)
-        self.daysLabel = QLabel("дней")
-
         self.timeEdit = QTimeEdit()
         self.timeEdit.setDisplayFormat("hh:mm:ss")
 
-        layout.addWidget(self.daysSpin)
-        layout.addWidget(self.daysLabel)
+        self.daysSpin = QSpinBox()
+        self.daysSpin.setRange(0, 9)
+        self.daysSpin.setValue(0)
+        self.daysSpin.setMaximumWidth(30)
+        self.daysLabel1 = QLabel("+")
+        self.daysLabel2 = QLabel("дней")
+
         layout.addWidget(self.timeEdit)
+        layout.addWidget(self.daysLabel1)
+        layout.addWidget(self.daysSpin)
+        layout.addWidget(self.daysLabel2)
+        layout.addStretch()
         
     def seconds(self):
         return (self.daysSpin.value()*86400 +
