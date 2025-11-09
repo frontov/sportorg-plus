@@ -2381,9 +2381,27 @@ class TeamResult(object):
         for i in range(len(self.members_results)):
             self.members_results[i].scores = self.score
 
+    def get_penalty_time(self):
+        penalty_time = OTime()
+        for r in self.members_results:
+            penalty_time = max(penalty_time, r.get_penalty_time())
+        return penalty_time
+
+    def get_credit_time(self):
+        credit_time = None
+        for r in self.members_results:
+            credit_time = min(credit_time, r.get_credit_time()) if credit_time else r.get_credit_time()
+        return credit_time if credit_time else OTime()
+
     def get_time(self):
         if len(self.members_results) > 0:
-            return self.finish_time - self.start_time
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            ret_ms = (self.finish_time - self.start_time).to_msec(time_accuracy)
+            ret_ms += self.get_penalty_time().to_msec(time_accuracy)
+            ret_ms -= self.get_credit_time().to_msec(time_accuracy)
+            if ret_ms < 0:
+                ret_ms = 0
+            return OTime(msec=ret_ms)
         return OTime()
 
     def is_status_ok(self):
