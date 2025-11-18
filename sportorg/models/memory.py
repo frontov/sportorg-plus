@@ -1373,7 +1373,9 @@ class RaceData(Model):
             return 0
         if date_ is None:
             date_ = datetime.datetime.now()
-        return max((date_ - self.start_datetime).days, 0)
+        d1 = self.start_datetime.date()
+        d2 = date_.date()
+        return max((d2 - d1).days, 0)
 
     def to_dict(self):
         return {
