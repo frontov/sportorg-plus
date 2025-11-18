@@ -16,7 +16,6 @@ from sportorg.modules.teamwork import Teamwork
 
 
 class CourseEditDialog(QDialog):
-    control_was_pressed = False;
 
     def __init__(self, course, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
@@ -89,14 +88,8 @@ class CourseEditDialog(QDialog):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.cancel_changes()
-        if event.key() == Qt.Key_Control:
-            self.control_was_pressed = True
-        if event.key() in [Qt.Key_Return, Qt.Key_Enter] and self.control_was_pressed:
+        if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
             self.apply_changes()
-
-    def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Control:
-            self.control_was_pressed = False
 
     def check_name(self):
         name = self.item_name.text()

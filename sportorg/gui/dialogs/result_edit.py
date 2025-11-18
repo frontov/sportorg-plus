@@ -26,8 +26,6 @@ from sportorg.common.extendedtimeedit import DurationEdit
 
 
 class ResultEditDialog(QDialog):
-    control_was_pressed = False;
-
     def __init__(self, result, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         self.current_object = result
@@ -158,14 +156,8 @@ class ResultEditDialog(QDialog):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.cancel_changes()
-        if event.key() == Qt.Key_Control:
-            self.control_was_pressed = True
-        if event.key() in [Qt.Key_Return, Qt.Key_Enter] and self.control_was_pressed:
+        if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
             self.apply_changes()
-
-    def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Control:
-            self.control_was_pressed = False
 
     def show_person_info(self):
         bib = self.item_bib.value()
