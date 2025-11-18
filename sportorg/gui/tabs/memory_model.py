@@ -3,7 +3,7 @@ import re
 import uuid
 from abc import abstractmethod
 from copy import copy, deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from PySide2.QtCore import QAbstractTableModel, Qt
 from typing import List
@@ -445,6 +445,28 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
     def set_source_array(self, array):
         self.race.results = array
 
+    @staticmethod
+    def _parse_time_with_day(value):
+        if not isinstance(value, str):
+            return None
+        m = re.fullmatch(r"(\d\d):(\d\d):(\d\d)(\+(\d))?", value)
+        if not m:
+            return None
+
+        h, mnt, s, _, day = m.groups()
+        day_offset = int(day) if day else 0
+
+        td = timedelta(hours=int(h), minutes=int(mnt), seconds=int(s))
+        return (day_offset, int(td.total_seconds()))
+
+
+    def sort_key(self, obj, column):
+        item = self.get_item(obj, column)
+
+        parsed = self._parse_time_with_day(item)
+        if parsed is not None:
+            return (0, parsed)
+        return (1, item is None, str(type(item)), item)
 
 class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
