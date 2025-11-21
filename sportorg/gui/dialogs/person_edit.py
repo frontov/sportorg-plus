@@ -34,6 +34,7 @@ class PersonEditDialog(QDialog):
         time_accuracy = race().get_setting('time_accuracy', 0)
         if time_accuracy:
             self.time_format = 'hh:mm:ss.zzz'
+        self.use_birthday = Config().configuration.get('use_birthday', False)
 
     def exec_(self):
         self.init_ui()
@@ -56,8 +57,7 @@ class PersonEditDialog(QDialog):
         self.item_name.addItems(get_names())
         self.layout.addRow(self.label_name, self.item_name)
 
-        use_birthday = Config().configuration.get('use_birthday', False)
-        if use_birthday:
+        if self.use_birthday:
             self.label_birthday = QLabel(_('Birthday'))
             self.item_birthday = QDateEdit()
             self.item_birthday.setDate(date.today())
@@ -77,19 +77,19 @@ class PersonEditDialog(QDialog):
         self.item_sex.addItems(Sex.get_titles())
         self.item_sex.currentTextChanged.connect(self.on_sex_change)
 
-        if use_birthday:
-            self.label_age = QLabel(_('Age'))
-            self.item_age = QSpinBox()
-            self.item_age.setMinimum(0)
-            self.item_age.setMaximum(200)
-            self.item_age.setEnabled(False)
-            hbox = QHBoxLayout()
-            hbox.addWidget(self.item_sex)
-            hbox.addWidget(self.label_age)
-            hbox.addWidget(self.item_age)
-            self.layout.addRow(self.label_sex, hbox)
-        else:
-            self.layout.addRow(self.label_sex, self.item_sex)
+        #if self.use_birthday:
+        self.label_age = QLabel(_('Age'))
+        self.item_age = QSpinBox()
+        self.item_age.setMinimum(0)
+        self.item_age.setMaximum(200)
+        self.item_age.setEnabled(False)
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.item_sex)
+        hbox.addWidget(self.label_age)
+        hbox.addWidget(self.item_age)
+        self.layout.addRow(self.label_sex, hbox)
+        #else:
+        #    self.layout.addRow(self.label_sex, self.item_sex)
 
         self.label_group = QLabel(_('Group'))
         self.item_group = AdvComboBox()
@@ -192,26 +192,37 @@ class PersonEditDialog(QDialog):
         98 - > 1998
         0 -> 0 exception!
         """
-        widget = self.sender()
-        year = widget.value()
+        year = self.item_year.value()
+        new_year = year
         if 0 < year < 100:
             cur_year = date.today().year
             new_year = cur_year - cur_year % 100 + year
             if new_year > cur_year:
                 new_year -= 100
-            widget.setValue(new_year)
+            self.item_year.setValue(new_year)
+        self.item_age.setValue(race().data.get_start_datetime().year - new_year)
+        if self.current_object.get_year() != new_year:
+            self._update_groups_by_sex_and_age()
 
     def birthday_change(self):
         widget = self.sender()
-        new_birthday = qdate_to_date(widget.date())
+        new_birthday = qdate_to_date(self.item_birthday.date())
         self.item_age.setValue(Person.get_age_by_birthdate(new_birthday))
+        self._update_groups_by_sex_and_age()
     
     def on_sex_change(self):
+        self._update_groups_by_sex_and_age()
+
+    def _update_groups_by_sex_and_age(self):
         person = self.current_object
-        if person.sex.get_title() != self.item_sex.currentText():
+        if person.sex.get_title() != self.item_sex.currentText() or person.age != self.item_age.value():
             sex = Sex.get_by_name(self.item_sex.currentText())
+            current_group = self.item_group.currentText()
             self.item_group.clear()
-            self.item_group.addItems(self.get_groups_by_sex(sex))
+            new_groups = self.get_groups_by_sex_and_age(sex, self.item_age.value())
+            self.item_group.addItems(new_groups)
+            if current_group and current_group in new_groups:
+                self.item_group.setCurrentText(current_group)
 
     def items_ok(self):
         ret = True
@@ -291,11 +302,13 @@ class PersonEditDialog(QDialog):
             else:
                 self.label_team_info.setText(_('Change team to No{} "{}"').format(team.number, team.name))
 
-    def get_groups_by_sex(self, sex):
+    def get_groups_by_sex_and_age(self, sex, age):
         groups = []
-        for g in race().groups:
-            if g.name and (g.sex == Sex.MF or sex == g.sex):
-                groups.append(g.name)
+        if age > 0:
+            for g in race().groups:
+                if g.name and (g.sex == Sex.MF or sex == g.sex):
+                    if g.min_age == 0 and g.max_age == 0 or g.min_age <= age <= g.max_age:
+                        groups.append(g.name)
         return groups
         
 
@@ -304,7 +317,7 @@ class PersonEditDialog(QDialog):
         self.item_surname.selectAll()
         self.item_name.setCurrentText(self.current_object.name)
         self.item_sex.setCurrentText(self.current_object.sex.get_title())
-        self.item_group.addItems(self.get_groups_by_sex(self.current_object.sex))
+        self.item_group.addItems(self.get_groups_by_sex_and_age(self.current_object.sex, self.current_object.age))
         if self.current_object.group:
             self.item_group.setCurrentText(self.current_object.group.name)
         else:
@@ -342,14 +355,14 @@ class PersonEditDialog(QDialog):
 
         self.item_comment.setText(self.current_object.comment)
 
-        use_birthday = Config().configuration.get('use_birthday', False)
-        if use_birthday:
+        if self.use_birthday:
             if self.current_object.birth_date:
                 self.item_birthday.setDate(self.current_object.birth_date)
                 self.item_age.setValue(self.current_object.age)
         else:
             if self.current_object.get_year():
                 self.item_year.setValue(self.current_object.get_year())
+                self.year_change()
 
     def open_team_dialog(self):
         try:
@@ -419,8 +432,7 @@ class PersonEditDialog(QDialog):
         if person.comment != self.item_comment.toPlainText():
             person.comment = self.item_comment.toPlainText()
 
-        use_birthday = Config().configuration.get('use_birthday', False)
-        if use_birthday:
+        if self.use_birthday:
             new_birthday = qdate_to_date(self.item_birthday.date())
             if person.birth_date != new_birthday and new_birthday:
                 if person.birth_date or new_birthday != date.today():
