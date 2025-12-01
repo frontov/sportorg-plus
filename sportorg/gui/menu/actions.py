@@ -37,7 +37,7 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import race, ResultStatus, ResultManual, find
+from sportorg.models.memory import race, ResultStatus, ResultManual, find, SystemType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number, copy_card_number_to_bib, split_teams, update_subgroups, merge_groups
@@ -433,17 +433,13 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
 
 class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
-        SIReaderClient().toggle()
-
-
-class SportiduinoReadoutAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        SportiduinoClient().toggle()
-
-
-class SFRReadoutAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        SFRReaderClient().toggle()
+        punch_system = race().get_punch_system()
+        if punch_system == SystemType.SFR:
+            SFRReaderClient().toggle()
+        elif punch_system == SystemType.SPORTIDUINO:
+            SportiduinoClient().toggle()
+        else:
+            SIReaderClient().toggle()
 
 
 class CreateReportAction(Action, metaclass=ActionFactory):

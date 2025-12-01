@@ -9,7 +9,7 @@ from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race
+from sportorg.models.memory import race, SystemType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.sportident.sireader import ScanPortsThread
 from sportorg.utils.time import time_to_otime
@@ -53,6 +53,18 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_si_port = AdvComboBox()
         self.scan_ports()
         self.tk_layout.addRow(self.label_si_port, self.item_si_port)
+
+        self.punch_system_box = QGroupBox(_('Punch system'))
+        self.punch_system_layout = QFormLayout()
+        self.punch_system_si = QRadioButton(_('SPORTident'))
+        self.punch_system_layout.addRow(self.punch_system_si)
+        self.punch_system_sfr = QRadioButton(_('SFR'))
+        self.punch_system_layout.addRow(self.punch_system_sfr)
+        self.punch_system_sportiduino = QRadioButton(_('Sportiduino (Clever)'))
+        self.punch_system_layout.addRow(self.punch_system_sportiduino)
+        self.punch_system_si.setChecked(True)
+        self.punch_system_box.setLayout(self.punch_system_layout)
+        self.tk_layout.addRow(self.punch_system_box)
 
         self.chip_reading_box = QGroupBox(_('Assigning a card when reading'))
         self.chip_reading_layout = QFormLayout()
@@ -315,10 +327,18 @@ class TimekeepingPropertiesDialog(QDialog):
         duplicate_chip_processing = cur_race.get_setting('system_duplicate_chip_processing', 'several_results')
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
         si_port = cur_race.get_setting('system_port', '')
+        punch_system = cur_race.get_punch_system()
 
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
 
         self.item_si_port.setCurrentText(si_port)
+
+        if punch_system == SystemType.SFR:
+            self.punch_system_sfr.setChecked(True)
+        elif punch_system == SystemType.SPORTIDUINO:
+            self.punch_system_sportiduino.setChecked(True)
+        else:
+            self.punch_system_si.setChecked(True)
 
         if start_source == 'protocol':
             self.item_start_protocol.setChecked(True)
@@ -502,6 +522,13 @@ class TimekeepingPropertiesDialog(QDialog):
         if port == scan_ports_string:
             port = ''
         obj.set_setting('system_port', port)
+
+        if self.punch_system_sfr.isChecked():
+            obj.set_setting('punch_system', SystemType.SFR.value)
+        elif self.punch_system_sportiduino.isChecked():
+            obj.set_setting('punch_system', SystemType.SPORTIDUINO.value)
+        else:
+            obj.set_setting('punch_system', SystemType.SPORTIDENT.value)
 
         obj.set_setting('system_start_source', start_source)
         obj.set_setting('system_finish_source', finish_source)

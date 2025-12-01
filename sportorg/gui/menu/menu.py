@@ -346,21 +346,10 @@ def menu_list():
             'title': _('Service'),
             'actions': [
                 {
-                    'title': _('on/off SPORTident readout'),
+                    'title': _('On/Off cards readout'),
                     'icon': config.icon_dir('sportident.png'),
                     'shortcut': 'F8',
                     'action': 'SPORTidentReadoutAction'
-                },
-                {
-                    'title': _('on/off Sportiduino readout'),
-                    'icon': config.icon_dir('sportiduino.png'),
-                    'action': 'SportiduinoReadoutAction'
-                },
-                {
-                    'title': _('on/off SFR readout'),
-                    'icon': config.icon_dir('sfr.png'),
-                    'shortcut': 'F10',
-                    'action': 'SFRReadoutAction'
                 },
                 {
                     'title': _('Teamwork'),

@@ -1825,17 +1825,8 @@ msgstr "Присвоить результат по номеру чипа"
 msgid "Service"
 msgstr "Сервис"
 
-#: gui/menu/menu.py:349
-msgid "on/off SPORTident readout"
-msgstr "Запустить/остановить чтение чипов SPORTident"
-
-#: gui/menu/menu.py:355
-msgid "on/off Sportiduino readout"
-msgstr "Запустить/остановить чтение чипов Sportiduino"
-
-#: gui/menu/menu.py:361
-msgid "on/off SFR readout"
-msgstr "Запустить/остановить чтение чипов SFR"
+msgid "On/Off cards readout"
+msgstr "Запустить/остановить чтение чипов"
 
 #: gui/menu/menu.py:380
 msgid "On/Off"
@@ -2221,6 +2212,9 @@ msgstr "Онлайн включен.\nХотите выключить его?"
 
 msgid "Cards"
 msgstr "Чипы"
+
+msgid "Punch system"
+msgstr "Система отметки"
 
 #~ msgid "Internal printing"
 #~ msgstr "Стандартный шаблон"

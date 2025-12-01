@@ -18,7 +18,7 @@ from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.team_edit import TeamEditDialog
 from sportorg.gui.dialogs.control_point_edit import ControlPointEditDialog
 from sportorg.models.constant import RentCards
-from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index
+from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index, SystemType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
@@ -103,8 +103,8 @@ class MainWindow(QMainWindow):
         self.show()
         self.post_show()
 
-    sportident_status = False
-    sportident_icon = {
+    reader_status = False
+    reader_icon = {
         True: 'sportident-on.png',
         False: 'sportident.png',
     }
@@ -125,18 +125,23 @@ class MainWindow(QMainWindow):
 
     def interval(self):
         if self.get_configuration().get('try_restore_backup'):
-            for client in [SIReaderClient, SportiduinoClient, SFRReaderClient]:
-                if client().is_need_check_backup and client().is_result_thread_alive():
-                    client().is_need_check_backup = False
-                    entries = self._check_card_data_backup(client().log_file_prefix())
-                    if entries is not None:
-                        client().inject_backup_card_data(entries)
+            punch_system = race().get_punch_system()
+            client = SIReaderClient
+            if punch_system == SystemType.SFR:
+                client = SFRReaderClient
+            elif punch_system == SystemType.SPORTIDUINO:
+                client = SportiduinoClient
+            if client().is_need_check_backup and client().is_result_thread_alive():
+                client().is_need_check_backup = False
+                entries = self._check_card_data_backup(client().log_file_prefix())
+                if entries is not None:
+                    client().inject_backup_card_data(entries)
 
-        if SIReaderClient().is_alive() != self.sportident_status:
-            self.sportident_status = SIReaderClient().is_alive()
+        if client().is_alive() != self.reader_status:
+            self.reader_status = client().is_alive()
             self.toolbar_property['sportident'].setIcon(
                 QtGui.QIcon(
-                    config.icon_dir(self.sportident_icon[self.sportident_status])))
+                    config.icon_dir(self.reader_icon[self.reader_status])))
         # FIXME
         """
         if Teamwork().is_alive() != self.teamwork_status:
