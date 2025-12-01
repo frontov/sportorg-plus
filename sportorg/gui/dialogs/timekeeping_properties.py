@@ -243,16 +243,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.time_settings_accuracy_edit.setMaximum(3)
         self.time_settings_layout.addRow(self.time_settings_accuracy_label, self.time_settings_accuracy_edit)
 
-        self.time_settings_format = QGroupBox()
-        self.time_settings_format.setTitle(_('Format of competitions'))
-        self.time_settings_format_less = QRadioButton(_('< 24'))
-        self.time_settings_format_more = QRadioButton(_('> 24'))
-        self.time_settings_format_layout = QFormLayout()
-        self.time_settings_format_layout.addRow(self.time_settings_format_less)
-        self.time_settings_format_layout.addRow(self.time_settings_format_more)
-        self.time_settings_format.setLayout(self.time_settings_format_layout)
-        self.time_settings_layout.addRow(self.time_settings_format)
-
         self.time_settings_tab.setLayout(self.time_settings_layout)
 
         tab_widget.addTab(self.timekeeping_scroll_area, _('SPORTident (Sportiduino, ...) settings'))
@@ -452,13 +442,8 @@ class TimekeepingPropertiesDialog(QDialog):
 
         # time settings
         time_accuracy = obj.get_setting('time_accuracy', 0)
-        time_format_24 = obj.get_setting('time_format_24', 'less24')
 
         self.time_settings_accuracy_edit.setValue(time_accuracy)
-        if time_format_24 == 'less24':
-            self.time_settings_format_less.setChecked(True)
-        elif time_format_24 == 'more24':
-            self.time_settings_format_more.setChecked(True)
 
     def apply_changes_impl(self):
         obj = race()
@@ -592,11 +577,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         # time settings
         time_accuracy = self.time_settings_accuracy_edit.value()
-        time_format_24 = 'less24'
-        if self.time_settings_format_more.isChecked():
-            time_format_24 = 'more24'
 
         obj.set_setting('time_accuracy', time_accuracy)
-        obj.set_setting('time_format_24', time_format_24)
 
         ResultCalculation(race()).process_results()
