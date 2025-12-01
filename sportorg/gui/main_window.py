@@ -233,8 +233,28 @@ class MainWindow(QMainWindow):
         self.service_timer.timeout.connect(self.interval)
         self.service_timer.start(1000) # msec
 
-        live_client.init()
         self._menu_disable(self.current_tab)
+
+        if (Configuration().parser.getboolean('live', 'recommend_disable_live', fallback=True)
+                and race().get_setting('live_enabled', False)):
+            message_box = QMessageBox(
+                QMessageBox.Question,
+                _('Question'),
+                _('Live is enabled.\nDo you want to disable it?'),
+                QMessageBox.Yes | QMessageBox.No | QMessageBox.Ignore,
+                self
+            )
+            message_box.button(QMessageBox.Yes).setText(_('Yes'))
+            message_box.button(QMessageBox.No).setText(_('No'))
+            message_box.button(QMessageBox.Ignore).setText(_('Do not show again'))
+            message_box.setDefaultButton(QMessageBox.No)
+            confirm = message_box.exec_()
+            if confirm == QMessageBox.Ignore:
+                Configuration().set_option('live', 'recommend_disable_live', False)
+            elif confirm == QMessageBox.Yes:
+                race().set_setting('live_enabled', False)
+             
+        live_client.init()
 
         if Configuration().configuration.get('check_updates'):
             last_update_check_date_str = Configuration().parser.get(
