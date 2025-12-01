@@ -354,7 +354,6 @@ def menu_list():
                 {
                     'title': _('on/off Sportiduino readout'),
                     'icon': config.icon_dir('sportiduino.png'),
-                    'shortcut': 'F9',
                     'action': 'SportiduinoReadoutAction'
                 },
                 {
@@ -411,6 +410,7 @@ def menu_list():
                 {
                     'title': _('Timekeeping settings'),
                     'icon': config.icon_dir('stopwatch.svg'),
+                    'shortcut': 'F9',
                     'action': 'TimekeepingSettingsAction'
                 },
                 {

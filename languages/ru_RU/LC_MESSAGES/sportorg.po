@@ -2219,6 +2219,9 @@ msgstr "отс"
 msgid "Live is enabled.\nDo you want to disable it?"
 msgstr "Онлайн включен.\nХотите выключить его?"
 
+msgid "Cards"
+msgstr "Чипы"
+
 #~ msgid "Internal printing"
 #~ msgstr "Стандартный шаблон"
 

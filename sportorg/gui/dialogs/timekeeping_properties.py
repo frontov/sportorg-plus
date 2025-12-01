@@ -30,11 +30,11 @@ class TimekeepingPropertiesDialog(QDialog):
         self.thread.exit()
 
     def init_ui(self):
-        self.setMinimumWidth(700)
         self.setWindowTitle(_('Timekeeping settings'))
         # self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
+        self.setMinimumWidth(400)
 
         tab_widget = QTabWidget()
 
@@ -53,69 +53,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_si_port = AdvComboBox()
         self.scan_ports()
         self.tk_layout.addRow(self.label_si_port, self.item_si_port)
-
-        self.start_group_box = QGroupBox(_('Start time'))
-        self.start_layout = QFormLayout()
-        self.item_start_protocol = QRadioButton(_('From protocol'))
-        self.start_layout.addRow(self.item_start_protocol)
-        self.item_start_station = QRadioButton(_('Start station'))
-        self.start_layout.addRow(self.item_start_station)
-        self.item_start_cp = QRadioButton(_('Control point'))
-        self.item_start_cp_value = QSpinBox()
-        self.item_start_cp_value.setMaximum(999)
-        self.item_start_cp_value.setMaximumSize(60, 30)
-        self.item_start_cp.toggled.connect(
-            lambda checked: self.item_start_cp_value.setEnabled(checked))
-        self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
-        self.item_start_by_group = QRadioButton(_('By groups (mass start)'))
-        self.start_layout.addRow(self.item_start_by_group)
-        self.item_start_gate = QRadioButton(_('Start gate'))
-        self.item_start_gate.setDisabled(True)
-        self.start_layout.addRow(self.item_start_gate)
-        self.start_group_box.setLayout(self.start_layout)
-        self.tk_layout.addRow(self.start_group_box)
-
-        self.finish_group_box = QGroupBox(_('Finish time'))
-        self.finish_layout = QFormLayout()
-
-        # Create a button group for mutually exclusive radio buttons
-        self.finish_button_group = QButtonGroup(self)
-
-        self.item_finish_station = QRadioButton(_('Finish station'))
-        self.finish_button_group.addButton(self.item_finish_station)
-        self.finish_layout.addRow(self.item_finish_station)
-
-        self.missed_finish_group_box = QGroupBox(_('Missed finish'))
-        self.missed_finish_layout = QFormLayout()
-        self.missed_finish_readout = QRadioButton(_('Readout time'))
-        self.missed_finish_layout.addRow(self.missed_finish_readout)
-        self.missed_finish_zero = QRadioButton('00:00:00')
-        self.missed_finish_layout.addRow(self.missed_finish_zero)
-        self.missed_finish_dsq = QRadioButton(_('DSQ'))
-        self.missed_finish_layout.addRow(self.missed_finish_dsq)
-        self.missed_finish_penalty = QRadioButton(_('Last control + penalty'))
-        self.missed_finish_layout.addRow(self.missed_finish_penalty)
-        self.missed_finish_group_box.setLayout(self.missed_finish_layout)
-        self.item_finish_station.toggled.connect(
-            lambda checked: self.missed_finish_group_box.setEnabled(checked))
-        self.finish_layout.addRow(self.missed_finish_group_box)
-
-        self.item_finish_cp = QRadioButton(_('Control point'))
-        self.item_finish_cp_value = QSpinBox()
-        self.item_finish_cp_value.setMaximum(999)
-        self.item_finish_cp_value.setMinimum(-1)
-        self.item_finish_cp_value.setMaximumSize(60, 30)
-        self.item_finish_cp.toggled.connect(
-            lambda checked: self.item_finish_cp_value.setEnabled(checked))
-        self.finish_button_group.addButton(self.item_finish_cp)
-        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
-
-        self.item_finish_beam = QRadioButton(_('Light beam'))
-        self.item_finish_beam.setDisabled(True)
-        self.finish_button_group.addButton(self.item_finish_beam)
-        self.finish_layout.addRow(self.item_finish_beam)
-        self.finish_group_box.setLayout(self.finish_layout)
-        self.tk_layout.addRow(self.finish_group_box)
 
         self.chip_reading_box = QGroupBox(_('Assigning a card when reading'))
         self.chip_reading_layout = QFormLayout()
@@ -151,14 +88,12 @@ class TimekeepingPropertiesDialog(QDialog):
         self.tk_layout.addRow(self.card_number_as_bib)
 
         self.timekeeping_tab.setLayout(self.tk_layout)
-        self.timekeeping_scroll_area = QScrollArea()
-        self.timekeeping_scroll_area.setWidget(self.timekeeping_tab)
-        self.timekeeping_scroll_area.setWidgetResizable(True)
 
         # result processing tab
         self.result_proc_tab = QWidget()
         self.result_proc_layout = QFormLayout()
         self.rp_time_radio = QRadioButton(_('by time'))
+        self.rp_time_radio.toggled.connect(self.on_rp_mode_changed)
         self.result_proc_layout.addRow(self.rp_time_radio)
         self.rp_scores_radio = QRadioButton(_('by scores'))
         self.rp_scores_radio.toggled.connect(self.on_rp_mode_changed)
@@ -183,6 +118,69 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_scores_layout.addRow(QLabel(_('Max delay, minutes')), self.rp_scores_max_delay)
         self.result_proc_layout.addRow(self.rp_scores_group)
         self.result_proc_tab.setLayout(self.result_proc_layout)
+
+        self.start_group_box = QGroupBox(_('Start time'))
+        self.start_layout = QFormLayout()
+        self.item_start_protocol = QRadioButton(_('From protocol'))
+        self.start_layout.addRow(self.item_start_protocol)
+        self.item_start_station = QRadioButton(_('Start station'))
+        self.start_layout.addRow(self.item_start_station)
+        self.item_start_cp = QRadioButton(_('Control point'))
+        self.item_start_cp_value = QSpinBox()
+        self.item_start_cp_value.setMaximum(999)
+        self.item_start_cp_value.setMaximumSize(60, 30)
+        self.item_start_cp.toggled.connect(
+            lambda checked: self.item_start_cp_value.setEnabled(checked))
+        self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
+        self.item_start_by_group = QRadioButton(_('By groups (mass start)'))
+        self.start_layout.addRow(self.item_start_by_group)
+        self.item_start_gate = QRadioButton(_('Start gate'))
+        self.item_start_gate.setDisabled(True)
+        self.start_layout.addRow(self.item_start_gate)
+        self.start_group_box.setLayout(self.start_layout)
+        self.result_proc_layout.addRow(self.start_group_box)
+
+        self.finish_group_box = QGroupBox(_('Finish time'))
+        self.finish_layout = QFormLayout()
+
+        # Create a button group for mutually exclusive radio buttons
+        self.finish_button_group = QButtonGroup(self)
+
+        self.item_finish_station = QRadioButton(_('Finish station'))
+        self.finish_button_group.addButton(self.item_finish_station)
+        self.finish_layout.addRow(self.item_finish_station)
+
+        self.item_finish_cp = QRadioButton(_('Control point'))
+        self.item_finish_cp_value = QSpinBox()
+        self.item_finish_cp_value.setMaximum(999)
+        self.item_finish_cp_value.setMinimum(-1)
+        self.item_finish_cp_value.setMaximumSize(60, 30)
+        self.item_finish_cp.toggled.connect(
+            lambda checked: self.item_finish_cp_value.setEnabled(checked))
+        self.finish_button_group.addButton(self.item_finish_cp)
+        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
+
+        self.item_finish_beam = QRadioButton(_('Light beam'))
+        self.item_finish_beam.setDisabled(True)
+        self.finish_button_group.addButton(self.item_finish_beam)
+        self.finish_layout.addRow(self.item_finish_beam)
+        self.finish_group_box.setLayout(self.finish_layout)
+
+        self.missed_finish_group_box = QGroupBox(_('Missed finish'))
+        self.missed_finish_layout = QFormLayout()
+        self.missed_finish_readout = QRadioButton(_('Readout time'))
+        self.missed_finish_layout.addRow(self.missed_finish_readout)
+        self.missed_finish_zero = QRadioButton('00:00:00')
+        self.missed_finish_layout.addRow(self.missed_finish_zero)
+        self.missed_finish_dsq = QRadioButton(_('DSQ'))
+        self.missed_finish_layout.addRow(self.missed_finish_dsq)
+        self.missed_finish_penalty = QRadioButton(_('Last control + penalty'))
+        self.missed_finish_layout.addRow(self.missed_finish_penalty)
+        self.missed_finish_group_box.setLayout(self.missed_finish_layout)
+        self.item_finish_station.toggled.connect(
+            lambda checked: self.missed_finish_group_box.setEnabled(checked))
+        self.finish_layout.addRow(self.missed_finish_group_box)
+        self.result_proc_layout.addRow(self.finish_group_box)
 
         # marked route settings
         self.marked_route_tab = QWidget()
@@ -245,11 +243,11 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.time_settings_tab.setLayout(self.time_settings_layout)
 
-        tab_widget.addTab(self.timekeeping_scroll_area, _('SPORTident (Sportiduino, ...) settings'))
-        tab_widget.addTab(self.result_proc_tab, _('Result processing'))
+        tab_widget.addTab(self.timekeeping_tab, _('Cards'))
+        tab_widget.addTab(self.result_proc_tab, _('Result'))
         tab_widget.addTab(self.scores_tab, _('Scores'))
-        tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
-        tab_widget.addTab(self.time_settings_tab, _('Time settings'))
+        tab_widget.addTab(self.marked_route_tab, _('Penalty'))
+        tab_widget.addTab(self.time_settings_tab, _('Time'))
 
         def cancel_changes():
             self.close()
@@ -294,13 +292,16 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_reading_box.setDisabled(mode)
         self.chip_duplicate_box.setDisabled(mode)
 
-    def on_rp_mode_changed(self, rp_scores_mode):
-        self.rp_scores_group.setEnabled(rp_scores_mode)
+    def on_rp_mode_changed(self):
+        rp_scores_mode = self.rp_scores_radio.isChecked()
         self.scores_tab.setDisabled(rp_scores_mode)
         self.marked_route_tab.setDisabled(rp_scores_mode)
         if rp_scores_mode:
+            self.rp_scores_group.show()
             self.mr_off_radio.setChecked(True)
             self.scores_off.setChecked(True)
+        else:
+            self.rp_scores_group.hide()
 
     def set_values_from_model(self):
         cur_race = race()
@@ -387,7 +388,7 @@ class TimekeepingPropertiesDialog(QDialog):
             self.rp_time_radio.setChecked(True)
         else:
             self.rp_scores_radio.setChecked(True)
-        self.on_rp_mode_changed(self.rp_scores_radio.isChecked())
+        #self.on_rp_mode_changed(self.rp_scores_radio.isChecked())
 
         if rp_score_mode == 'rogain':
             self.rp_rogain_scores_radio.setChecked(True)
