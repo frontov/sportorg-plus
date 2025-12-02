@@ -134,7 +134,6 @@ class CourseControl(Model):
         self.code = ''
         self.length = 0
         self.order = 0
-        self.cutoff = False
 
     def __str__(self):
         return '{} {}'.format(self.code, self.length)
@@ -174,14 +173,11 @@ class CourseControl(Model):
             'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length,
-            'cutoff': self.cutoff
         }
 
     def update_data(self, data):
         self.code = str(data['code'])
         self.length = int(data['length'])
-        if 'cutoff' in data:
-            self.cutoff = bool(data['cutoff'])
 
 
 class ControlPoint(Model):

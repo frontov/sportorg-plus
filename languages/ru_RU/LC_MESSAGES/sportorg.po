@@ -731,6 +731,12 @@ msgstr "Время"
 msgid "Credit"
 msgstr "Отсечка"
 
+msgid "no credit time"
+msgstr "Без отсечки"
+
+msgid "credit time control point"
+msgstr "Номер станции отсечки"
+
 #: gui/dialogs/result_edit.py:121 gui/tabs/memory_model.py:334
 #: gui/tabs/memory_model.py:337 modules/printing/printout_split.py:121
 msgid "Penalty"
