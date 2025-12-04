@@ -601,6 +601,7 @@ class Result:
         self.final_result_time = None  # type: OTime real time, when nobody can win
 
         self.card_number = 0
+        self.card_battery_level = None  # 0-100%, Huichang contact-less card
         self.splits = []  # type: List[Split]
         self.__start_time = None
         self.__finish_time = None
@@ -673,6 +674,7 @@ class Result:
 
             'splits': [split.to_dict() for split in self.splits],
             'card_number': self.card_number,
+            'card_battery_level': self.card_battery_level,
 
             'speed': self.speed,  # readonly
             'length': self.length,  # readonly
@@ -717,6 +719,8 @@ class Result:
             self.bib = int(data['bib'])
         if 'card_number' in data:
             self.card_number = int(data['card_number'])
+        if 'card_battery_level' in data and data['card_battery_level']:
+            self.card_battery_level = int(data['card_battery_level'])
         if 'splits' in data:
             self.splits = []
             for item in data['splits']:

@@ -44,6 +44,12 @@ class HuichangResultThread(ResultThreadBase):
     def _check_data(self, card_data):
         return card_data
 
+    @staticmethod
+    def _get_result(card_data):
+        result = ResultThreadBase._get_result(card_data)
+        if 'battery_level' in card_data:
+            result.card_battery_level = max(0, min(100, card_data['battery_level']))
+        return result
 
 @singleton
 class HuichangClient(ReaderClientBase):
