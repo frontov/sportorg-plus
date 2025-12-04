@@ -50,6 +50,7 @@ from sportorg.modules.coordinates import coordinates
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.huichang.huichang import HuichangClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
 from sportorg.modules.updater import checker
@@ -438,6 +439,8 @@ class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
             SFRReaderClient().toggle()
         elif punch_system == SystemType.SPORTIDUINO:
             SportiduinoClient().toggle()
+        elif punch_system == SystemType.HUICHANG:
+            HuichangClient().toggle()
         else:
             SIReaderClient().toggle()
 

@@ -1,4 +1,5 @@
 import logging
+import datetime
 import time
 
 from queue import Queue, Empty
@@ -65,6 +66,8 @@ class ResultThreadBase(QThread):
 
     @staticmethod
     def _datetime_to_otime(dt):
+        if isinstance(dt, datetime.time):
+            return time_to_otime(dt)
         return time_to_otime(dt, memory.race().get_days(dt))
 
     @staticmethod

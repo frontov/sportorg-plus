@@ -41,6 +41,7 @@ from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.reader.backup import parse_backup_from_last_save
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.huichang.huichang import HuichangClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
 from sportorg.modules.updater import checker
@@ -124,13 +125,16 @@ class MainWindow(QMainWindow):
         return None
 
     def interval(self):
+        punch_system = race().get_punch_system()
+        client = SIReaderClient
+        if punch_system == SystemType.SFR:
+            client = SFRReaderClient
+        elif punch_system == SystemType.SPORTIDUINO:
+            client = SportiduinoClient
+        elif punch_system == SystemType.HUICHANG:
+            client = HuichangClient
+
         if self.get_configuration().get('try_restore_backup'):
-            punch_system = race().get_punch_system()
-            client = SIReaderClient
-            if punch_system == SystemType.SFR:
-                client = SFRReaderClient
-            elif punch_system == SystemType.SPORTIDUINO:
-                client = SportiduinoClient
             if client().is_need_check_backup and client().is_result_thread_alive():
                 client().is_need_check_backup = False
                 entries = self._check_card_data_backup(client().log_file_prefix())
@@ -171,6 +175,7 @@ class MainWindow(QMainWindow):
         self.unlock_file()
         Broker().produce('close')
         SportiduinoClient().stop()
+        HuichangClient().stop()
         SIReaderClient().stop()
         SFRReaderClient().stop()
 
@@ -231,8 +236,9 @@ class MainWindow(QMainWindow):
 
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
-        SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
-        SFRReaderClient().set_call(self.add_sfr_result_from_reader)
+        SportiduinoClient().set_call(self.add_sportident_result_from_sireader)
+        SFRReaderClient().set_call(self.add_sportident_result_from_sireader)
+        HuichangClient().set_call(self.add_sportident_result_from_sireader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -657,12 +663,6 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(e)
 
-    def add_sfr_result_from_reader(self, result):
-        self.add_sportident_result_from_sireader(result)
-
-    def add_sportiduino_result_from_reader(self, result):
-        self.add_sportident_result_from_sireader(result)
-
     def teamwork(self, command):
         try:
             race().update_data(command.data)
@@ -722,7 +722,7 @@ class MainWindow(QMainWindow):
                 File(self.file, logging.root, File.JSON).save()
                 self.apply_filters()
                 self.last_update = time.time()
-                for client in [SIReaderClient, SportiduinoClient, SFRReaderClient]:
+                for client in [SIReaderClient, SportiduinoClient, SFRReaderClient, HuichangClient]:
                     client().save_event()
             except Exception as e:
                 logging.exception(e)

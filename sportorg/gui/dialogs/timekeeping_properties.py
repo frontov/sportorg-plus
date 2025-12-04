@@ -62,6 +62,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.punch_system_layout.addRow(self.punch_system_sfr)
         self.punch_system_sportiduino = QRadioButton(_('Sportiduino (Clever)'))
         self.punch_system_layout.addRow(self.punch_system_sportiduino)
+        self.punch_system_huichang = QRadioButton(_('Huichang'))
+        self.punch_system_layout.addRow(self.punch_system_huichang)
         self.punch_system_si.setChecked(True)
         self.punch_system_box.setLayout(self.punch_system_layout)
         self.tk_layout.addRow(self.punch_system_box)
@@ -359,6 +361,8 @@ class TimekeepingPropertiesDialog(QDialog):
             self.punch_system_sfr.setChecked(True)
         elif punch_system == SystemType.SPORTIDUINO:
             self.punch_system_sportiduino.setChecked(True)
+        elif punch_system == SystemType.HUICHANG:
+            self.punch_system_huichang.setChecked(True)
         else:
             self.punch_system_si.setChecked(True)
 
@@ -557,6 +561,8 @@ class TimekeepingPropertiesDialog(QDialog):
             obj.set_setting('punch_system', SystemType.SFR.value)
         elif self.punch_system_sportiduino.isChecked():
             obj.set_setting('punch_system', SystemType.SPORTIDUINO.value)
+        elif self.punch_system_huichang.isChecked():
+            obj.set_setting('punch_system', SystemType.HUICHANG.value)
         else:
             obj.set_setting('punch_system', SystemType.SPORTIDENT.value)
 

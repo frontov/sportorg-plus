@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from datetime import time
+from datetime import datetime, time
 from serial import Serial
 from serial.serialutil import SerialException
 
@@ -27,8 +27,11 @@ class Huichang(object):
     START_SEQUENCE = b'\xaa\xbb\xff'
 
     CMD_CARD_DATA = b'\x20'
+    CMD_SET_MASTER_MODE = b'\x28'
+    CMD_CONTACT_CARD_DATA = b'\x60'
     CMD_WRITE_FINGER_NAME = b'\x64'
     CMD_READ_FINGER_NAME = b'\x65'
+    CMD_CARD_BATTERY_LEVEL = b'\xa1'
 
     def __init__(self, port=None, debug=False, logger=None):
         self._serial = None
@@ -44,6 +47,17 @@ class Huichang(object):
 
         if port:
             self._connect_master_station(port)
+            self.switch_to_online_mode()
+
+
+    def __del__(self):
+        self.disconnect()
+
+
+    def disconnect(self):
+        if self._serial is not None:
+            self._log_info("Disconnect master station")
+            self._serial.close()
 
 
     def send_command(self, cmd, params=None, wait_response=True, timeout=None):
@@ -53,11 +67,8 @@ class Huichang(object):
             raise HuichangException("Not connected to master station")
 
         datalen = len(params) + 1
-        packet = cmd + bytes([datalen]) + params
-        crc = 0xff
-        if datalen > 1:
-            crc = self.crc8(packet)
-        packet = self.START_SEQUENCE + packet + bytes([crc])
+        crc = self.crc8(params)
+        packet = self.START_SEQUENCE + cmd + bytes([datalen]) + params + bytes([crc])
 
         self._log_debug("=> 0x {}".format(" ".join(f"{b:02x}" for b in packet)))
 
@@ -65,16 +76,38 @@ class Huichang(object):
         self._serial.write(packet)
 
         if wait_response:
-            resp_code, data = self._read_response(timeout)
-            return self._process_response(resp_code, data)
+            return self.read_and_parse_response(timeout)
 
         return None
 
+    def switch_to_online_mode(self):
+        time = datetime.now()
+        params = b''
+        params += bytes([time.hour])
+        params += bytes([time.minute])
+        params += bytes([time.second])
+        params += b'\x02'  # online mode
+        self.send_command(self.CMD_SET_MASTER_MODE, params)
+
     def _connect_master_station(self, port):
         try:
-            self._serial = Serial(port, baudrate=38400, timeout=3)
+            self._log_info("Open port {}".format(port))
+            self._serial = Serial(port, baudrate=9600, timeout=3)
         except (SerialException, OSError):
             raise HuichangException(("Could not open port {}").format(port))
+
+    def read_and_parse_response(self, timeout):
+        resp_code, data = self._read_response(timeout)
+        return self._process_response(resp_code, data)
+
+    def wait_card_data(self):
+        try:
+            return self.read_and_parse_response(timeout=0.5)
+        except HuichangTimeout:
+            pass
+        except HuichangException as msg:
+            self._log_debug(f"Warning: {msg}")
+        return None
 
     def _read_response(self, timeout=None):
         if self._serial is None:
@@ -91,23 +124,31 @@ class Huichang(object):
                 byte = serial.read()
                 if byte == b"":
                     raise HuichangTimeout("No response")
-                elif byte == Huichang.START_SEQUENCE[0] and serial.read() == Huichang.START_SEQUENCE[1] and serial.read() == Huichang.START_SEQUENCE[2]:
+                elif (byte == bytes([Huichang.START_SEQUENCE[0]])
+                        and serial.read() == bytes([Huichang.START_SEQUENCE[1]])
+                        and serial.read() == bytes([Huichang.START_SEQUENCE[2]])):
                     break
+                self._log_debug("Skipping byte: 0x {}".format(" ".join(f"{b:02x}" for b in byte)))
 
             cmd_code = serial.read()
-            length = serial.read()
+            length_byte = serial.read()
+            length = length_byte[0]
             if length < 1:
                 raise HuichangException(f"Invalid length: {length}")
 
             read_more_fragments = False
-            if cmd_code == Huichang.CMD_CARD_DATA and length > 1:
+            if cmd_code in [Huichang.CMD_CARD_DATA, Huichang.CMD_CONTACT_CARD_DATA] and length > 1:
                 read_more_fragments = True
 
             payload = serial.read(length - 1)
             crc = serial.read()
-            self._log_debug("<= code 0x{b:02x}, len {}, data 0x {}".format(cmd_code, length, " ".join(f"{b:02x}" for b in payload)))
-            if not self.crc8(cmd_code + length + payload) == crc:
-                raise HuichangException("CRC mismatch")
+            self._log_debug("<= code 0x{:02x}, length {}, crc 0x{:02x} payload: 0x {}".format(cmd_code[0], length, crc[0], " ".join(f"{b:02x}" for b in payload)))
+            # Ignore CRC for CMD_CARD_BATTERY_LEVEL
+            if cmd_code != Huichang.CMD_CARD_BATTERY_LEVEL:
+                crc_calc = self.crc8(payload)
+                if not crc_calc == crc[0]:
+                    #self._log_debug("CRC mismatch: 0x{:02x} != 0x{:02x}".format(crc_calc, crc[0]))
+                    raise HuichangException("CRC mismatch")
 
         except (SerialException, OSError) as msg:
             raise HuichangException(f"Error reading response: {msg}")
@@ -125,23 +166,46 @@ class Huichang(object):
         return cmd_code, payload
 
     def _process_response(self, cmd_code, data):
-        if cmd_code == Huichang.CMD_CARD_DATA:
+        if cmd_code == Huichang.CMD_SET_MASTER_MODE and len(data) == 1:
+            if data == b'\xcc':
+                self._log_debug("Success")
+            elif data == b'\xee':
+                raise HuichangException("Device returned error")
+        elif cmd_code in [Huichang.CMD_CARD_DATA, Huichang.CMD_CONTACT_CARD_DATA]:
             ret = {}
-            ret["card_number"] = int.from_bytes(data[0:4], order="big")
-            ret["start_time"] = huichang._to_time(data[5:9])
-            ret["finish_time"] = huichang._to_time(data[10:14])
-            ret["clear_time"] = huichang._to_time(data[15:18])
+            ret["card_number"] = int(data[0:4].hex())
+            ret["start"] = self._to_time(data[5:9])
+            ret["finish"] = self._to_time(data[10:14])
+            ret["clear"] = self._to_time(data[15:18])
             ret["punches"] = []
             for i in range(18, len(data), 4):
                 cp_code = data[i]
-                cp_time = Huichang._to_time(data[i + 1:i + 4])
+                cp_time = self._to_time(data[i + 1:i + 4])
                 ret["punches"].append((cp_code, cp_time))
+
+            if cmd_code == Huichang.CMD_CARD_DATA:
+                # Wait packet with battery level
+                try:
+                    next_cmd_code, next_data = self._read_response(timeout=0.2)
+                    if next_cmd_code == Huichang.CMD_CARD_BATTERY_LEVEL:
+                        ret["battery_level"] = int(next_data[0])
+                    else:
+                        # another packet received
+                        ret["battery_level"] = None
+                except HuichangTimeout:
+                    ret["battery_level"] = None
+
+            self._log_debug(f"Card data: {ret}")
             return ret
-        else:
-            return None
+        elif cmd_code == Huichang.CMD_CARD_BATTERY_LEVEL:
+            self._log_debug(f"Card battery: {data[0]}%")
+
+        return None
 
     @staticmethod
     def _to_time(data: bytes) -> time:
+        if data[0] > 23 or data[1] > 59 or data[2] > 59:
+            return time()
         ms = 0
         if len(data) > 3:
             ms = data[3]
@@ -150,8 +214,8 @@ class Huichang(object):
 
     @staticmethod
     def crc8(data: bytes) -> int:
-        poly = 0x1d
-        crc = 0x03  # init
+        poly = 29
+        crc = 0xff  # init
 
         for byte in data:
             crc ^= byte
@@ -160,7 +224,7 @@ class Huichang(object):
                     crc = ((crc << 1) ^ poly) & 0xFF
                 else:
                     crc = (crc << 1) & 0xFF
-        crc ^= 0x03  # xorout
+        crc ^= 0x00  # xorout
         return crc
 
 class HuichangException(Exception):
@@ -171,7 +235,7 @@ class HuichangTimeout(HuichangException):
 
 
 if __name__ == "__main__":
-    hc = Huichang("/dev/ttyUSB0", debug=True)
-    hc.send_command(Huichang.CMD_READ_FINGER_NAME, wait_response=False)
-    hc.send_command(Huichang.CMD_WRITE_FINGER_NAME, params=bytes.fromhex("61 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20"))
+    hc = Huichang("/dev/ttyACM0", debug=True)
+    while True:
+        hc.wait_card_data()
 

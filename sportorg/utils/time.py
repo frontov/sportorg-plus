@@ -25,6 +25,8 @@ def timeit(method):
 def time_to_otime(t, day=0):
     if isinstance(t, datetime.datetime):
         return OTime(day, t.hour, t.minute, t.second, round(t.microsecond/1000))
+    if isinstance(t, datetime.time):
+        return OTime(day, t.hour, t.minute, t.second, round(t.microsecond/1000))
     if isinstance(t, QTime):
         return OTime(day, t.hour(), t.minute(), t.second(), t.msec())
     if isinstance(t, datetime.timedelta):

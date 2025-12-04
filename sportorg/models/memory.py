@@ -32,6 +32,7 @@ class SystemType(Enum):
     SPORTIDENT = 2
     SFR = 3
     SPORTIDUINO = 4
+    HUICHANG = 7
 
     def __str__(self):
         return self._name_
@@ -745,8 +746,6 @@ class Result:
             ret += str(self.scores) + ' ' + _('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
-        if self.person.group is None:
-            print(self.person)
         if self.person.group.is_team_race():
             ret += self.get_result_otime_team().to_str(time_accuracy)
         else:
@@ -885,7 +884,7 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() or self.is_sfr() or self.is_sportiduino()
+        return self.system_type not in [SystemType.NONE, SystemType.MANUAL]
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -895,6 +894,9 @@ class Result:
 
     def is_sportiduino(self):
         return self.system_type == SystemType.SPORTIDUINO
+
+    def is_huichang(self):
+        return self.system_type == SystemType.HUICHANG
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -1191,6 +1193,8 @@ class ResultSFR(ResultSportident):
 class ResultSportiduino(ResultSportident):
     system_type = SystemType.SPORTIDUINO
 
+class ResultHuichang(ResultSportident):
+    system_type = SystemType.HUICHANG
 
 class Person(Model):
     def __init__(self):
@@ -1404,6 +1408,7 @@ class Race(Model):
         'ResultSportident': ResultSportident,
         'ResultSFR': ResultSFR,
         'ResultSportiduino': ResultSportiduino,
+        'ResultHuichang': ResultHuichang,
         'Group': Group,
         'Course': Course,
         'Team': Team,
@@ -1434,6 +1439,7 @@ class Race(Model):
             'ResultSportident': self.results,
             'ResultSFR': self.results,
             'ResultSportiduino': self.results,
+            'ResultHuichang': self.results,
             'Group': self.groups,
             'Course': self.courses,
             'Team': self.teams,
@@ -1493,7 +1499,7 @@ class Race(Model):
         if dict_obj['object'] == 'Person':
             obj.group = self.get_obj('Group', dict_obj['group_id'])
             obj.team = self.get_obj('Team', dict_obj['team_id'])
-        elif dict_obj['object'] in ['Result', 'ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
+        elif dict_obj['object'] in ['Result', 'ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino', 'ResultHuichang']:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
             obj.course = self.get_obj('Course', dict_obj['course_id'])
