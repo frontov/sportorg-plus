@@ -55,7 +55,7 @@ class ResultEditDialog(QDialog):
         self.item_created_at.setReadOnly(True)
 
         self.item_card_number = QSpinBox()
-        self.item_card_number.setMaximum(9999999)
+        self.item_card_number.setMaximum(99999999)  # Huichang has 8 digits
 
         self.item_bib = QSpinBox()
         self.item_bib.setMaximum(Limit.BIB)
