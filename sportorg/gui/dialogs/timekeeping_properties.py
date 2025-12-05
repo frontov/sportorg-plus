@@ -119,16 +119,16 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_scores_layout.addRow(self.rp_rogain_scores_radio)
         self.rp_fixed_scores_radio = QRadioButton(_('fixed scores'))
         self.rp_fixed_scores_edit = QSpinBox()
-        self.rp_fixed_scores_edit.setMaximumWidth(50)
+        self.rp_fixed_scores_edit.setMaximumSize(50, 30)
         self.rp_scores_layout.addRow(self.rp_fixed_scores_radio, self.rp_fixed_scores_edit)
         self.rp_scores_penalty_edit = QSpinBox()
-        self.rp_scores_penalty_edit.setMaximumWidth(50)
+        self.rp_scores_penalty_edit.setMaximumSize(50, 30)
         self.rp_scores_penalty_period_edit = QSpinBox()
-        self.rp_scores_penalty_period_edit.setMaximumWidth(50)
+        self.rp_scores_penalty_period_edit.setMaximumSize(50, 30)
         self.rp_scores_layout.addRow(QLabel(_('Penalty points per period')), self.rp_scores_penalty_edit)
         self.rp_scores_layout.addRow(QLabel(_('Penalty period, minutes')), self.rp_scores_penalty_period_edit)
         self.rp_scores_max_delay = QSpinBox()
-        self.rp_scores_max_delay.setMaximumWidth(50)
+        self.rp_scores_max_delay.setMaximumSize(50, 30)
         self.rp_scores_layout.addRow(QLabel(_('Max delay, minutes')), self.rp_scores_max_delay)
         self.result_proc_layout.addRow(self.rp_scores_group)
         self.result_proc_tab.setLayout(self.result_proc_layout)
@@ -148,9 +148,13 @@ class TimekeepingPropertiesDialog(QDialog):
         self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
         self.item_start_by_group = QRadioButton(_('By groups (mass start)'))
         self.start_layout.addRow(self.item_start_by_group)
+
+        # Not implemented
         self.item_start_gate = QRadioButton(_('Start gate'))
         self.item_start_gate.setDisabled(True)
+        self.item_start_gate.setVisible(False)
         self.start_layout.addRow(self.item_start_gate)
+
         self.start_group_box.setLayout(self.start_layout)
         self.result_proc_layout.addRow(self.start_group_box)
 
@@ -174,8 +178,10 @@ class TimekeepingPropertiesDialog(QDialog):
         self.finish_button_group.addButton(self.item_finish_cp)
         self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
 
+        # Not implemented
         self.item_finish_beam = QRadioButton(_('Light beam'))
         self.item_finish_beam.setDisabled(True)
+        self.item_finish_beam.setVisible(False)
         self.finish_button_group.addButton(self.item_finish_beam)
         self.finish_layout.addRow(self.item_finish_beam)
         self.finish_group_box.setLayout(self.finish_layout)
@@ -213,7 +219,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_lap_station_check = QCheckBox(_('lap station'))
         self.mr_lap_station_check.setDisabled(True)  # TODO
         self.mr_lap_station_edit = QSpinBox()
-        self.mr_lap_station_edit.setMaximumWidth(50)
+        self.mr_lap_station_edit.setMaximumSize(50, 30)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(_("Don't disqualify for missed punches"))
         self.mr_layout.addRow(self.mr_dont_dqs_check)
