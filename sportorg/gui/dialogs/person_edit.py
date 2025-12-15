@@ -3,7 +3,7 @@ from datetime import date
 
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
-    QDialogButtonBox, QDateEdit
+    QDialogButtonBox, QDateEdit, QPushButton
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -144,6 +144,12 @@ class PersonEditDialog(QDialog):
         self.label_card_info = QLabel('')
         self.layout.addRow(QLabel(''), self.label_card_info)
 
+        self.button_exchange_card = QPushButton(_('Exchange card'))
+        self.button_exchange_card.setToolTip(_('Exchange card with another person'))
+        self.button_exchange_card.clicked.connect(self.exchange_card)
+        self.button_exchange_card.hide()
+        self.layout.addRow(QLabel(''), self.button_exchange_card)
+
         self.item_rented = QCheckBox(_('rented card'))
         self.item_paid = QCheckBox(_('is paid'))
         self.item_out_of_competition = QCheckBox(_('out of competition'))
@@ -260,6 +266,8 @@ class PersonEditDialog(QDialog):
     def check_card(self):
         number = self.item_card.value()
         self.label_card_info.setText('')
+        self.button_exchange_card.hide()
+
         if number:
             person = None
             for _p in race().persons:
@@ -278,6 +286,7 @@ class PersonEditDialog(QDialog):
                 if person.bib:
                     info = '{}\n{}: {}'.format(info, _('Bib'), person.bib)
                 self.label_card_info.setText(info)
+                self.button_exchange_card.show()
             else:
                 self.label_card_info.setText(_('Card number is unique'))
                 self.is_ok['card'] = True
@@ -285,6 +294,16 @@ class PersonEditDialog(QDialog):
                     self.button_ok.setEnabled(True)
         else:
             self.button_ok.setEnabled(True)
+
+    def exchange_card(self):
+        new_card_number = self.item_card.value()
+        person = find(race().persons, card_number=new_card_number)
+        if not person:
+            return
+        print('Exchange card', self.current_object, person, new_card_number, self.current_object.card_number)
+        person.card_number = self.current_object.card_number
+        self.current_object.card_number = new_card_number
+        self.check_card()
 
     def _is_new_team_name_set(self):
         person = self.current_object
