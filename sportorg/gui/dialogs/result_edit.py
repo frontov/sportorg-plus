@@ -7,10 +7,12 @@ from datetime import datetime
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
-    QTimeEdit, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QComboBox
+    QTimeEdit, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QComboBox, \
+    QPushButton, QStyle, QHBoxLayout
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
+from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
@@ -61,6 +63,12 @@ class ResultEditDialog(QDialog):
         self.item_bib.setMaximum(Limit.BIB)
         self.item_bib.valueChanged.connect(self.show_person_info)
 
+        self.find_button = QPushButton('')
+        icon = self.find_button.style().standardIcon(QStyle.SP_FileDialogContentsView)
+        self.find_button.setIcon(icon)
+        self.find_button.setMaximumSize(40, 40)
+        self.find_button.clicked.connect(self.find_person)
+
         self.label_person_info = QLabel('')
 
         self.item_finish = DurationEdit()
@@ -100,7 +108,11 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(QLabel(_('Created at')), self.item_created_at)
         if self.current_object.is_punch():
             self.layout.addRow(QLabel(_('Card number')), self.item_card_number)
-        self.layout.addRow(QLabel(_('Bib')), self.item_bib)
+        bib_layout = QHBoxLayout()
+        bib_layout.addWidget(self.item_bib)
+        bib_layout.addWidget(self.find_button)
+        self.layout.addRow(QLabel(_('Bib')), bib_layout)
+        #self.layout.addRow(QLabel(_('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
         self.layout.addRow(QLabel(_('Start')), self.item_start)
         self.layout.addRow(QLabel(_('Finish')), self.item_finish)
@@ -175,6 +187,14 @@ class ResultEditDialog(QDialog):
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
+
+    def find_person(self):
+        bib_dialog = BibDialog(str(self.item_bib.value()))
+        bib_dialog.exec_()
+        person = bib_dialog.get_person()
+        if person:
+            self.item_bib.setValue(person.bib)
+            self.show_person_info()
 
     def set_values_from_model(self):
         if self.current_object.is_punch():
