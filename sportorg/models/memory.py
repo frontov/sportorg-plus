@@ -1348,7 +1348,7 @@ class RaceData(Model):
         self.chief_referee = ''
         self.secretary = ''
         self.url = ''
-        self.race_type = RaceType.INDIVIDUAL_RACE
+        self.race_type = RaceType.TEAM_RACE
         self.start_datetime = None  # type: datetime
         self.end_datetime = None  # type: datetime
         self.relay_leg_count = 3
