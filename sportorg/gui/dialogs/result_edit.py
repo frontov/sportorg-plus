@@ -131,9 +131,8 @@ class ResultEditDialog(QDialog):
         if self.current_object.is_punch():
             start_source = race().get_setting('system_start_source', 'protocol')
             finish_source = race().get_setting('system_finish_source', 'station')
-            if start_source == 'protocol' or start_source == 'cp' or start_source == 'group':
-                #self.item_start.setDisabled(True)
-                pass
+            if start_source == 'cp':
+                self.item_start.setDisabled(True)
             if finish_source == 'cp':
                 self.item_finish.setDisabled(True)
             self.layout.addRow(self.splits.widget)

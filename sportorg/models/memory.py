@@ -969,10 +969,8 @@ class ResultSportident(Result):
     def get_start_time(self):
         obj = race()
         start_source = obj.get_setting('system_start_source', 'protocol')
-        if start_source == 'protocol':
-            if self.person and self.person.start_time and self.person.start_time.to_msec():
-                return self.person.start_time
-        elif start_source == 'station':
+        if start_source in ['protocol', 'station']:
+            # If have start punch in result use one
             if self.start_time and self.start_time.to_msec():
                 return self.start_time
             elif self.person and self.person.start_time and self.person.start_time.to_msec():
@@ -989,8 +987,6 @@ class ResultSportident(Result):
                     if split.code == str(start_cp_number):
                         self.__start_time = split.time
                         return self.__start_time
-        elif start_source == 'gate':
-            pass
         elif start_source == 'group':
             # If have start punch in result use one
             if self.start_time and self.start_time.to_msec():
@@ -998,6 +994,8 @@ class ResultSportident(Result):
             elif self.person and self.person.group:
                 if self.person.group.start_time and self.person.group.start_time.to_msec():
                     return self.person.group.start_time
+        elif start_source == 'gate':
+            pass
 
         return OTime()
 
