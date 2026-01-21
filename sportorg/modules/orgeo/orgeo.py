@@ -141,19 +141,6 @@ def import_csv(source):
             obj.teams.append(team)
 
     for person_dict in orgeo_data.data:
-        person_team = None
-        if 'claim_id' in person_dict:
-            person_team = memory.find(obj.teams, number=person_dict['claim_id'])
-            if 'representative' in person_dict:
-                person_team.contact = person_dict['representative']
-            if 'cell_number' in person_dict:
-                person_team.contact += ' ' + person_dict['cell_number']
-            if 'email' in person_dict:
-                person_team.contact += ' ' + person_dict['email']
-            person_team.code = str(person_dict['code']) if 'code' in person_dict else ''
-            if 'district' in person_dict:
-                person_team.region = person_dict['district']
-
         person = memory.Person()
         person.name = person_dict['name']
         person.surname = person_dict['surname']
@@ -166,10 +153,32 @@ def import_csv(source):
         else:
             person.is_rented_card = True
         person.group = memory.find(obj.groups, name=person_dict['group_name'])
-        if person_team is not None:
-            if obj.is_team_race():
-                person_team.group = person.group
-            person.team = person_team
+
+        if 'claim_id' in person_dict:
+            person_team = memory.find(obj.teams, number=person_dict['claim_id'])
+            if person_team is not None:
+                if 'representative' in person_dict:
+                    person_team.contact = person_dict['representative']
+                if 'cell_number' in person_dict:
+                    person_team.contact += ' ' + person_dict['cell_number']
+                if 'email' in person_dict:
+                    person_team.contact += ' ' + person_dict['email']
+                person_team.code = str(person_dict['code']) if 'code' in person_dict else ''
+                if 'district' in person_dict:
+                    person_team.region = person_dict['district']
+
+                if obj.is_team_race():
+                    if person_team.group is None:
+                        person_team.group = person.group
+                    elif person.group is not None and person_team.group != person.group:
+                        new_team = person_team.clone()
+                        obj.team_max_number += 1
+                        new_team.number = obj.team_max_number
+                        new_team.group = person.group
+                        obj.teams.append(new_team)
+                        person_team = new_team
+                person.team = person_team
+
         if 'qual_id' in person_dict and person_dict['qual_id'].isdigit():
             person.qual = Qualification(int(person_dict['qual_id']))
         elif 'qual_str' in person_dict:
