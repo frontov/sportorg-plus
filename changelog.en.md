@@ -1,5 +1,29 @@
 # SportOrgPlus Changelog
 
+## v1.7.0 - 2026-02-27
+
+### Features
+
+* Added multiday events support (display time in 'hh:mm:ss+d' format).
+* Added HuiChang timing system.
+* Added cutoff station in timekeeping settings (default 250).
+* Updated timekeeping settings dialog.
+* Select punching system in timekeeping properties dialog.
+* Reverse row numbering in the results tab.
+* Use min/max age of group for available groups in person edit dialog.
+* Added button for exchanging card number with other person in person edit dialog.
+* Added Find button for searching person by name, surname or bib in result edit dialog.
+* Allow change start time in result if start source is 'protocol'.
+
+### Fixes
+
+* Calculation penalty and credit time for team result
+* Fixed copying of selected rows.
+* Split teams by groups when importing entries from Orgeo CSV or IOF XML.
+* Create new team for each person when importing from Winorient CSV.
+
+[All changes](https://github.com/sembruk/sportorg-plus/compare/v1.6.0...v1.7.0)
+
 ## v1.6.0 - 2025-10-09
 
 ### Features
