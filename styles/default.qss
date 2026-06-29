@@ -1,0 +1,38 @@
+QTableWidget,
+QTableView {
+  background-color: #181818;
+  alternate-background-color: #202020;
+  color: #F2F2F2;
+  gridline-color: #3A3A3A;
+  border: 1px solid #3A3A3A;
+  selection-background-color: #0A84FF;
+  selection-color: #FFFFFF;
+}
+
+QTableView::item,
+QTableWidget::item {
+  border-bottom: 1px solid #2D2D2D;
+  padding: 2px 6px;
+}
+
+QTableView::item:selected,
+QTableWidget::item:selected {
+  background-color: #0A84FF;
+  color: #FFFFFF;
+}
+
+QHeaderView {
+  color: #F2F2F2;
+}
+
+QHeaderView::section {
+  background-color: #2A2A2A;
+  color: #F2F2F2;
+  border: 1px solid #4A4A4A;
+  padding: 3px 6px;
+}
+
+QTableCornerButton::section {
+  background-color: #2A2A2A;
+  border: 1px solid #4A4A4A;
+}

@@ -2,7 +2,7 @@ boltons >= 20
 cx_Freeze >= 6
 docxtpl >= 0
 jinja2 >= 2
-playsound >= 1
+playsound==1.2.2
 polib >= 1
 pydantic-settings >= 2
 PySide6 >= 6

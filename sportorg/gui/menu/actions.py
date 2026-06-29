@@ -3,9 +3,9 @@ import time
 import uuid
 from typing import Any
 
-from PySide2 import QtCore
+from PySide6 import QtCore
 
-from PySide2.QtWidgets import QMessageBox, QApplication, QTableView, QInputDialog
+from PySide6.QtWidgets import QMessageBox, QApplication, QTableView, QInputDialog
 
 from sportorg import config
 from sportorg.common.otime import OTime

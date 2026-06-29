@@ -1,6 +1,6 @@
-from PySide2 import QtCore
-from PySide2.QtCore import QSortFilterProxyModel
-from PySide2.QtWidgets import QComboBox, QSpinBox, QCompleter, QMessageBox
+from PySide6 import QtCore
+from PySide6.QtCore import QSortFilterProxyModel
+from PySide6.QtWidgets import QComboBox, QSpinBox, QCompleter, QMessageBox
 
 from sportorg.language import _
 

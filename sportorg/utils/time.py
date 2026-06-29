@@ -2,7 +2,7 @@ import datetime
 from datetime import date
 import time
 
-from PySide2.QtCore import QTime, QDate
+from PySide6.QtCore import QTime, QDate
 
 from sportorg.common.otime import OTime
 from sportorg.language import _

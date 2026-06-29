@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets, QtGui
 from sportorg.modules.configs.configs import Config as Configuration
 
 class Widget(QtWidgets.QWidget):

@@ -2,7 +2,7 @@ from multiprocessing import freeze_support
 import sys
 import glob
 
-from PySide2.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 from sportorg import config
 from sportorg.common.singleton import Singleton

@@ -7,7 +7,7 @@ import time
 import serial
 
 from threading import main_thread
-from PySide2.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal
 from sportident import SIReader, SIReaderReadout, SIReaderSRR, SIReaderControl, SIReaderException, SIReaderCardChanged
 
 from sportorg.common.singleton import singleton

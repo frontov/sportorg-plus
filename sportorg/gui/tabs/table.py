@@ -1,6 +1,6 @@
-from PySide2 import QtWidgets, QtCore
-from PySide2.QtWidgets import QMenu, QAbstractItemView, QHeaderView
-from PySide2.QtCore import QPoint
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtWidgets import QMenu, QAbstractItemView, QHeaderView
+from PySide6.QtCore import QPoint
 
 
 class TableView(QtWidgets.QTableView):
@@ -13,6 +13,9 @@ class TableView(QtWidgets.QTableView):
         self.setAutoFillBackground(False)
         self.setSortingEnabled(True)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.setAlternatingRowColors(True)
+        self.setShowGrid(True)
+        self.setGridStyle(QtCore.Qt.SolidLine)
 
         hor_header = self.horizontalHeader()
         hor_header.setSectionsMovable(True)
@@ -44,4 +47,3 @@ class TableView(QtWidgets.QTableView):
 
     def set_column_order(self, column_order):
         self.horizontalHeader().restoreState(column_order)
-

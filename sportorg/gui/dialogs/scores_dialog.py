@@ -1,7 +1,7 @@
 import logging
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel, \
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QDialog, QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel, \
     QDialogButtonBox
 
 from sportorg import config

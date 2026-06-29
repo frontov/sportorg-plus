@@ -1,7 +1,7 @@
 import logging
 
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtWidgets import QAbstractItemView, QHeaderView
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.global_access import GlobalAccess

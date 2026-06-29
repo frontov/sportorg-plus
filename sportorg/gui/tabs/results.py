@@ -1,8 +1,8 @@
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QModelIndex
-from PySide2.QtWidgets import QAbstractItemView, QHeaderView, QTextEdit
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import QModelIndex
+from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QTextEdit
 
 from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.result_edit import ResultEditDialog

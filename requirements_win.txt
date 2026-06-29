@@ -5,17 +5,15 @@ jinja2 >= 2
 playsound >= 1
 polib >= 1
 pydantic-settings >= 2
-PySide2 >= 5
+PySide6 >= 6
 python-dateutil >= 2
 python-dotenv >= 0.14
 pywin32 >= 224
 pywinusb >= 0
 requests >= 2
-shiboken2 >= 5.15
 sportident >= 1
 chardet >= 3
 pylocker >= 3.1.0
 gpxpy
 utm
 aiohttp
-

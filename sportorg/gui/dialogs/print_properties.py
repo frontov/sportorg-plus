@@ -1,10 +1,10 @@
 import platform
 import logging
 
-from PySide2 import QtPrintSupport
-from PySide2.QtGui import QIcon
-from PySide2.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
+from PySide6 import QtPrintSupport
+from PySide6.QtGui import QIcon
+from PySide6.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
+from PySide6.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
     QDoubleSpinBox, QSpinBox
 
 from sportorg import config

@@ -1,7 +1,7 @@
 import logging
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QTimeEdit, QLabel, QRadioButton
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QTimeEdit, QLabel, QRadioButton
 
 from sportorg import config
 from sportorg.common.otime import OTime

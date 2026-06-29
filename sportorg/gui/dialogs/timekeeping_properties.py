@@ -1,7 +1,7 @@
 import logging
 
-from PySide2.QtCore import QTime
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, \
+from PySide6.QtCore import QTime
+from PySide6.QtWidgets import QFormLayout, QLabel, QDialog, \
      QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
      QGroupBox, QLineEdit, QScrollArea, QVBoxLayout, QButtonGroup
 

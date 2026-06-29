@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QTimeEdit, QHBoxLayout, QSpinBox, QWidget, QLabel
-from PySide2.QtCore import QTime, Qt, QEvent
+from PySide6.QtWidgets import QTimeEdit, QHBoxLayout, QSpinBox, QWidget, QLabel
+from PySide6.QtCore import QTime, Qt, QEvent
 
 class DurationEdit(QWidget):
     def __init__(self, parent=None):

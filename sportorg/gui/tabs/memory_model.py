@@ -5,7 +5,7 @@ from abc import abstractmethod
 from copy import copy, deepcopy
 from datetime import datetime, timedelta
 
-from PySide2.QtCore import QAbstractTableModel, Qt
+from PySide6.QtCore import QAbstractTableModel, Qt
 from typing import List
 
 from sportorg.language import _

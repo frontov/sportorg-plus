@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QApplication, QFileDialog, QTextEdit
+from PySide6.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QApplication, QFileDialog, QTextEdit
 from sportorg.libs.winorient.wdb_online_sender import WdbOnlineSender
 
 
