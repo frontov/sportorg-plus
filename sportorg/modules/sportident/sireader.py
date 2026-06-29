@@ -124,6 +124,15 @@ class SIReaderClient(ReaderClientBase):
             scan_ports = sorted(scan_ports)
         elif platform.system() == 'Windows':
             scan_ports = ['COM' + str(i) for i in range(48)]
+        elif platform.system() == 'Darwin':
+            scan_ports = [
+                os.path.join('/dev', f)
+                for f in os.listdir('/dev')
+                if re.match(r'cu\.(usb|wch|SLAB|serial).*', f)
+            ]
+            scan_ports = sorted(scan_ports)
+        else:
+            scan_ports = []
 
         for p in scan_ports:
             try:
