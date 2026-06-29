@@ -20,6 +20,10 @@ driver_enabled() {
   driver_info | grep -Eq 'activated[[:space:]]+enabled'
 }
 
+driver_status_line() {
+  driver_info | grep "$DRIVER_BUNDLE" || true
+}
+
 serial_ports() {
   ls /dev 2>/dev/null | grep -Ei '^(cu|tty)\.(usb|wch|SLAB|serial)' || true
 }
@@ -28,9 +32,18 @@ usb_ch34x_connected() {
   ioreg -p IOUSB -l 2>/dev/null | grep -Eqi 'USB Serial|1A86|7523'
 }
 
-open_driver_settings() {
-  open 'x-apple.systempreferences:com.apple.ExtensionsPreferences' >/dev/null 2>&1 || true
-  open 'x-apple.systempreferences:com.apple.LoginItems-Settings.extension' >/dev/null 2>&1 || true
+open_settings_url() {
+  open "$1" >/dev/null 2>&1 || true
+}
+
+open_driver_approval_settings() {
+  # macOS moves the driver approval button between releases. Try the most
+  # relevant panes first, then leave System Settings open as a fallback.
+  open_settings_url 'x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension'
+  open_settings_url 'x-apple.systempreferences:com.apple.preference.security?General'
+  open_settings_url 'x-apple.systempreferences:com.apple.ExtensionsPreferences'
+  open_settings_url 'x-apple.systempreferences:com.apple.LoginItems-Settings.extension'
+  open -a 'System Settings' >/dev/null 2>&1 || open -a 'System Preferences' >/dev/null 2>&1 || true
 }
 
 install_driver() {
@@ -69,15 +82,31 @@ if driver_enabled; then
   ok 'CH34x Driver Extension is enabled.'
 else
   warn 'Driver is installed but not approved/enabled yet.'
-  echo 'Opening Driver Extensions settings...'
-  open_driver_settings
+  echo 'Opening macOS driver approval settings...'
+  open_driver_approval_settings
   echo
+  status_line="$(driver_status_line)"
+  if [ -n "$status_line" ]; then
+    echo 'Current driver status:'
+    echo "$status_line"
+    echo
+  fi
   echo 'Enable this driver extension:'
   echo "$DRIVER_BUNDLE"
   echo
-  echo 'Path: System Settings -> General -> Login Items & Extensions -> Driver Extensions'
+  echo 'Where to look:'
+  echo '  - System Settings -> Privacy & Security -> Allow system software / driver'
+  echo '  - System Settings -> General -> Login Items & Extensions -> Driver Extensions'
   echo
   read -r -p 'Press Enter after enabling the driver, or press Enter to check later... '
+
+  if driver_enabled; then
+    ok 'Driver approved and active.'
+  else
+    echo 'Opening approval settings once more...'
+    open_driver_approval_settings
+    read -r -p 'Press Enter to re-check driver status... '
+  fi
 
   if driver_enabled; then
     ok 'Driver approved and active.'
