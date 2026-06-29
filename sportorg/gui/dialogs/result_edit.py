@@ -4,9 +4,9 @@ from abc import abstractmethod
 
 from datetime import datetime
 
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
     QTimeEdit, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QComboBox, \
     QPushButton, QStyle, QHBoxLayout
 

@@ -4,8 +4,8 @@ import os
 
 import webbrowser
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox
 from docxtpl import DocxTemplate
 from copy import copy, deepcopy
 

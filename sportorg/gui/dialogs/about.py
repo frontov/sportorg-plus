@@ -1,7 +1,7 @@
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 
-from PySide2.QtGui import QIcon, QPixmap, QFont
-from PySide2.QtWidgets import QFormLayout, QDialog, QLabel, QTextEdit
+from PySide6.QtGui import QIcon, QPixmap, QFont
+from PySide6.QtWidgets import QFormLayout, QDialog, QLabel, QTextEdit
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _

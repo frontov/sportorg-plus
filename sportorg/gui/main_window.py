@@ -5,9 +5,9 @@ import time
 import pylocker
 from queue import Queue
 from datetime import datetime
-from PySide2 import QtGui, QtWidgets
-from PySide2.QtCore import Qt, QModelIndex, QItemSelectionModel, QTimer, QRect
-from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
+from PySide6 import QtGui, QtWidgets
+from PySide6.QtCore import Qt, QModelIndex, QItemSelectionModel, QTimer, QRect
+from PySide6.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -325,7 +325,7 @@ class MainWindow(QMainWindow):
                 if action_item['type'] == 'separator':
                     parent.addSeparator()
             elif 'action' in action_item:
-                action = QtWidgets.QAction(self)
+                action = QtGui.QAction(self)
                 action.setText(action_item['title'])
                 action.triggered.connect(self.menu_factory.get_action(action_item['action']))
                 if 'shortcut' in action_item:
@@ -383,7 +383,7 @@ class MainWindow(QMainWindow):
     def _setup_toolbar(self):
         self.toolbar = self.addToolBar(_('Toolbar'))
         for tb in toolbar_list():
-            tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
+            tb_action = QtGui.QAction(QtGui.QIcon(tb[0]), tb[1], self)
             tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
             if len(tb) == 4:
                 self.toolbar_property[tb[3]] = tb_action
@@ -904,4 +904,3 @@ class MainWindow(QMainWindow):
         if self.file_lock_id is not None:
             self.file_locker.release(self.file_lock_id)
             logging.info(_('File lock released'))
-

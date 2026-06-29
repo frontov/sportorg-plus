@@ -3,10 +3,10 @@ import platform
 import logging
 from multiprocessing import Process
 
-from PySide2.QtCore import QSizeF
-from PySide2.QtGui import QTextDocument
-from PySide2.QtPrintSupport import QPrinter, QPrinterInfo
-from PySide2.QtWidgets import QApplication
+from PySide6.QtCore import QSizeF
+from PySide6.QtGui import QTextDocument
+from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
+from PySide6.QtWidgets import QApplication
 
 from sportorg.common.fake_std import FakeStd
 

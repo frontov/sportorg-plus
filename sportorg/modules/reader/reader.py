@@ -4,7 +4,7 @@ import time
 
 from queue import Queue, Empty
 from threading import main_thread, Event
-from PySide2.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal
 
 from sportorg.models import memory
 from sportorg.modules.reader.backup import CardDataBackuper

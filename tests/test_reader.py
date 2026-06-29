@@ -5,7 +5,7 @@ import subprocess
 import serial
 from threading import Thread, Event
 from sportorg.models.memory import race
-from PySide2.QtCore import QObject, Slot, Signal, QCoreApplication, QTimer
+from PySide6.QtCore import QObject, Slot, Signal, QCoreApplication, QTimer
 import pytest
 
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient

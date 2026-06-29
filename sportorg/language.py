@@ -2,7 +2,7 @@ import configparser
 import gettext
 import logging
 import os
-from PySide2.QtCore import QLocale
+from PySide6.QtCore import QLocale
 from sportorg import config
 
 

@@ -1,8 +1,8 @@
 import logging
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess

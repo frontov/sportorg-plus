@@ -1,8 +1,8 @@
 import logging
 from datetime import date
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFormLayout, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QDialogButtonBox, QDateEdit, QPushButton
 
 from sportorg import config
